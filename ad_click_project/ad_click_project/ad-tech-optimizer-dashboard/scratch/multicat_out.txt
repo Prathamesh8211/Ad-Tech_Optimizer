@@ -1,0 +1,7 @@
+1. 📌 **Direct Answer**: 8 campaigns across Electronics, Fashion, Food, Gaming, and Health are bleeding $423.92 in spend for only $243.46 in return, with 4 campaigns generating zero revenue.
+
+2. 📊 **Key Metrics**: $423.92 total wasted spend | $0.00 revenue from 4 campaigns (AD_0144, AD_0305, AD_0019, AD_0028) | Worst offender AD_0144 at $59.86 spend / 0.00x ROAS.
+
+3. 💡 **Business Insight**: Text ads dominate the underperformer list (4 of 8), and zero-revenue campaigns are concentrated in Text, Video, and Image formats — suggesting creative-fatigue or misaligned targeting rather than channel issues. Fashion (3 campaigns) and Gaming (2 campaigns) are the most repeat offenders.
+
+4. 🚀 **Action**: 🔴 **Pause immediately** the 4 zero-revenue campaigns (AD_0144, AD_0305, AD_0019, AD_0028); 🟡 **Monitor** the remaining 4 sub-1.55x ROAS campaigns for 48 hours and refresh creatives before deciding to cut.

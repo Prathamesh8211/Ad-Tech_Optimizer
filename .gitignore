@@ -1,0 +1,105 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+*.cover
+*.pyw
+*.rej
+*.so
+.cache
+.coverage
+.coverage.*
+.nox
+.pytest_cache
+.hypothesis
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.vscode/
+.idea/
+*.ipynb_checkpoints
+
+# Streamlit
+.streamlit/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Data and cache
+*.csv
+*.json
+*.sql
+mlflow.db
+*.db
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Environment variables
+.env
+.env.*
+
+# Model files
+*.pkl
+*.pickle
+*.joblib
+*.h5
+*.keras
+
+# Temporary files
+*.tmp
+*.temp
+.DS_Store
+ ehthumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# MLflow artifacts
+mlruns/
+mlartifacts/
+
+# Databricks
+dbcs/
+
+# Streamlit specific
+.ad-tech-optimizer-dashboard/.streamlit/
+.ad-tech-optimizer-dashboard/mlflow.db
+.ad-tech-optimizer-dashboard/.env
+
+# Ignore everything in Synthetic_Data except the raw data and scripts we want to keep
+Synthetic_Data/*_raw.csv
+Synthetic_Data/*_raw.py
+!Synthetic_Data/ad_catalog_raw.csv
+!Synthetic_Data/ad_catalog_raw.py
+!Synthetic_Data/raw_synthetic_ad_click_data.py
+!Synthetic_Data/data_quality.py
+!Synthetic_Data/data_quality_report.json
+
+# Ignore pycache in subdirectories
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+
+# Ignore notebook outputs
+ad_click_project/**/*.ipynb
+!ad_click_project/**/*.ipynb
+
+# Ignore large data files that should be in S3
+Ad-Tech\ Optimizer/**/*_data.*
+Ad-Tech\ Optimizer/**/*.parquet
+Ad-Tech\ Optimizer/**/*.csv

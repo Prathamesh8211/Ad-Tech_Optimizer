@@ -1,0 +1,7 @@
+1. 📌 **Direct Answer**: Device-level performance data is not available in the current dataset, so a definitive device recommendation cannot be made.
+
+2. 📊 **Key Metrics**: While devices aren't tracked, Gaming's **Video** format dominates performance — AD_0332 hit **$104.68** revenue from just **$0.88** spend (ROAS 118.95x).
+
+3. 💡 **Business Insight**: The Gaming category overall is highly profitable at **13.50x ROAS** (well above the 6.81x portfolio average), and Video ads are clearly the top-performing creative format — a likely proxy for high-intent device usage worth investigating.
+
+4. 🚀 **Action**: 🟡 Monitor — Enable device segmentation (mobile/tablet/desktop/console) in your analytics tracking to unlock actionable device-level insights before scaling spend.

@@ -1,0 +1,496 @@
+# ============================================================
+# AD-TECH OPTIMIZER - PRODUCTION PIPELINE MANIFEST
+# ============================================================
+
+# Purpose: Complete pipeline configuration for ad-tech optimization
+
+pipeline_name: "adtech_optimizer_pipeline"
+environment: "development"  # development | staging | production
+
+
+# ============================================================
+# 1. DATA SOURCE CONFIGURATION
+# ============================================================
+datasources:
+  user_clicks:
+    source_type: "csv"
+    local_path: "D:\\cdac\\Ad_click_project\\raw_synthetic_ad_click_data.csv"
+    databricks_path: "/Volumes/adtech_catalog/bronze/landing_zone/raw_synthetic_ad_click_data.csv"
+    target_schema: "adtech_catalog"
+    target_table: "bronze.ad_click_logs"
+    format_options:
+      header: true
+      inferSchema: true
+      multiLine: true
+      escape: '"'
+    file_size_mb: 50
+    expected_rows: 505000
+    
+    schema_corrections:
+      description: "Device column sometimes contains age prefix (e.g., '47 DESKTOP')"
+      fix_required: true
+      fix_logic: "extract_clean_device_from_corrupted_column"
+    
+    schema_definition:
+      columns:
+        User_ID:
+          type: "string"
+          format: "uuid"
+          description: "Unique user identifier"
+          required: true
+          business_meaning: "Anonymous user ID for tracking"
+        
+        Click_Timestamp:
+          type: "string"
+          description: "Event timestamp (multiple formats)"
+          valid_formats: 
+            - "yyyy-MM-dd HH:mm:ss"
+            - "dd/MM/yyyy HH:mm"
+          required: true
+          business_meaning: "When user interacted with ad"
+        
+        Ad_Reference_ID:
+          type: "string"
+          format: "AD_XXXXX"
+          description: "Ad identifier linking to catalog"
+          required: true
+          business_meaning: "Foreign key to ad catalog"
+        
+        Ad_Type:
+          type: "string"
+          description: "Type of advertisement"
+          valid_values: ["Video", "Image", "Text", "Carousel"]
+          required: false
+          business_meaning: "Creative format of the ad"
+        
+        Watch_Duration:
+          type: "double"
+          description: "Duration in seconds user watched"
+          valid_range: [0.0, 180.0]
+          unit: "seconds"
+          required: false
+          business_meaning: "Engagement depth indicator"
+        
+        user_age:
+          type: "integer"
+          description: "Age of the user"
+          valid_range: [18, 65]
+          required: false
+          business_meaning: "Demographic for targeting"
+          anomaly_notes: "Contains -1 and 125 as anomalies"
+        
+        device:
+          type: "string"
+          description: "Device used (CORRUPTED - has age prefix in some rows)"
+          valid_values: ["Desktop", "Mobile", "Tablet"]
+          required: false
+          business_meaning: "Device preference for optimization"
+          corruption_issue: "Some rows have 'age device' format like '47 DESKTOP'"
+          fix_priority: "HIGH"
+        
+        platform_source:
+          type: "string"
+          description: "Source platform"
+          valid_values: ["google", "facebook", "instagram"]
+          required: false
+          business_meaning: "Traffic source attribution"
+          anomaly_notes: "Contains 'gogle', 'facebok' typos"
+        
+        user_gender:
+          type: "string"
+          description: "User gender"
+          valid_values: ["Male", "Female", "Other"]
+          required: false
+          business_meaning: "Demographic segmentation"
+          anomaly_notes: "Contains identity shifting anomalies"
+        
+        user_clicked:
+          type: "integer"
+          description: "Binary click indicator"
+          valid_values: [0, 1]
+          required: true
+          business_meaning: "Conversion event indicator"
+          anomaly_notes: "Contains logical conflicts (clicked but 0 watch time)"
+
+  ad_catalog:
+    source_type: "csv"
+    local_path: "D:\\cdac\\Ad_click_project\\ad_catalog_raw.csv"
+    databricks_path: "/Volumes/adtech_catalog/bronze/landing_zone/ad_catalog_raw.csv"
+    target_schema: "adtech_catalog"
+    target_table: "bronze.ad_metadata_catalog"
+    format_options:
+      header: true
+      inferSchema: true
+      multiLine: true
+    expected_rows: 1050
+    
+    schema_definition:
+      columns:
+        Ad_Reference_ID:
+          type: "string"
+          format: "AD_XXXXX"
+          description: "Unique ad identifier"
+          required: true
+          business_meaning: "Primary key"
+          anomaly_notes: "Contains duplicates with corrupted categories"
+        
+        Ad_Category:
+          type: "string"
+          description: "Industry vertical"
+          valid_values: ["Electronics", "Fashion", "Travel", "Health", "Gaming", "Food"]
+          required: true
+          business_meaning: "Product/service category"
+          anomaly_notes: "Contains 'Eletronics' typo, lowercase values"
+        
+        Ad_Device:
+          type: "string"
+          description: "Target device for ad delivery"
+          valid_values: ["Desktop", "Mobile", "Tablet", "All-Devices"]
+          required: false
+          business_meaning: "Device targeting strategy"
+          anomaly_notes: "Contains '  Mobile  ' (spaces), 'moble' typo, empty strings"
+        
+        Ad_Location:
+          type: "string"
+          description: "Target geographic location"
+          valid_values: ["Maharashtra", "Delhi", "Karnataka", "Tamil Nadu", "Uttar Pradesh"]
+          required: false
+          business_meaning: "Location-based targeting"
+          anomaly_notes: "Contains trailing spaces"
+        
+        Cost_Per_Click:
+          type: "mixed"
+          description: "Cost per click in USD"
+          unit: "USD"
+          required: true
+          business_meaning: "Bid amount for ad delivery"
+          anomaly_notes: "Contains '$' prefix, negative values (-1.50)"
+        
+        Ad_Type:
+          type: "string"
+          description: "Ad creative type"
+          valid_values: ["Video", "Image", "Text", "Carousel"]
+          required: false
+          business_meaning: "Format selection"
+          anomaly_notes: "Contains 'video' (lowercase), 'Vedeo' typo, 'IMAGE' uppercase, 'Carusel' typo, nulls"
+        
+        ad_video_length:
+          type: "mixed"
+          description: "Video length in seconds"
+          unit: "seconds"
+          required: false
+          business_meaning: "Duration for video ads"
+          anomaly_notes: "Contains '45s' string, logical conflicts (non-video with length > 0)"
+
+# ============================================================
+# 2. TABLE DEFINITIONS
+# ============================================================
+tables:
+  bronze:
+    user_clicks:
+      name: "adtech_catalog.bronze.ad_click_logs"
+      description: "Raw user click events with all anomalies"
+      retention_days: 30
+      partition_by: ["ingestion_date"]
+    
+    ad_catalog:
+      name: "adtech_catalog.bronze.ad_metadata_catalog"
+      description: "Raw ad metadata with all anomalies"
+      retention_days: 30
+      partition_by: ["ingestion_date"]
+  
+  silver:
+    user_clicks:
+      name: "adtech_catalog.silver.conformed_user_clicks"
+      description: "Cleaned user click data with standardized formats"
+      partition_by: ["processing_date"]
+      expected_rows: 500000
+    
+    ad_catalog:
+      name: "adtech_catalog.silver.conformed_ad_catalog"
+      description: "Cleaned ad metadata with standardized fields"
+      partition_by: ["processing_date"]
+      expected_rows: 1000
+  
+  gold:
+    ad_performance:
+      name: "adtech_catalog.gold.fact_ad_performance"
+      description: "Aggregated ad performance metrics with features"
+      partition_by: ["ad_category", "processing_date"]
+      expected_rows: 1000
+    
+    ad_analytics:
+      name: "adtech_catalog.gold.ad_performance_analytics"
+      description: "Analytical views for dashboard and reporting"
+      partition_by: ["processing_date"]
+
+# ============================================================
+# 3. DATA QUALITY RULES
+# ============================================================
+data_quality:
+  bronze_validation:
+    user_clicks:
+      row_count:
+        min: 400000
+        max: 600000
+        severity: "high"
+        action: "alert"
+      
+      null_checks:
+        - column: "User_ID"
+          max_null_pct: 0.0
+          severity: "critical"
+        - column: "Click_Timestamp"
+          max_null_pct: 0.01
+          severity: "high"
+        - column: "Ad_Reference_ID"
+          max_null_pct: 0.0
+          severity: "critical"
+      
+      anomaly_detection:
+        - name: "timestamp_format_anomaly"
+          column: "Click_Timestamp"
+          check: "contains_slash_format"
+          expected_count: "~333"
+          severity: "medium"
+        
+        - name: "future_dates"
+          column: "Click_Timestamp"
+          check: "value == '2035-12-25 12:00:00'"
+          expected_count: "~200"
+          severity: "high"
+        
+        - name: "negative_watch_duration"
+          column: "Watch_Duration"
+          check: "value < 0"
+          expected_count: "~500"
+          severity: "high"
+        
+        - name: "overflow_watch_duration"
+          column: "Watch_Duration"
+          check: "value > 1000"
+          expected_count: "~167"
+          severity: "high"
+        
+        - name: "underage_users"
+          column: "user_age"
+          check: "value < 0"
+          expected_count: "~200"
+          severity: "medium"
+        
+        - name: "old_users"
+          column: "user_age"
+          check: "value > 100"
+          expected_count: "~125"
+          severity: "low"
+        
+        - name: "device_corruption"
+          column: "device"
+          check: "contains_age_prefix"
+          description: "Rows where device has age prefix like '47 DESKTOP'"
+          expected_count: "unknown"
+          severity: "critical"
+          fix_required: true
+    
+    ad_catalog:
+      row_count:
+        min: 900
+        max: 1200
+        severity: "high"
+        action: "alert"
+      
+      duplicate_check:
+        column: "Ad_Reference_ID"
+        expected_duplicates: 50
+        severity: "high"
+      
+      anomaly_detection:
+        - name: "corrupted_categories"
+          column: "Ad_Category"
+          check: "value == 'Corrupted_Category'"
+          expected_count: 50
+          severity: "critical"
+        
+        - name: "negative_cpc"
+          column: "Cost_Per_Click"
+          check: "value < 0"
+          expected_count: ">= 35"
+          severity: "high"
+        
+        - name: "cpc_with_dollar"
+          column: "Cost_Per_Click"
+          check: "contains_$"
+          expected_count: "~100"
+          severity: "medium"
+
+  silver_validation:
+    user_clicks:
+      row_count:
+        min: 450000
+        max: 510000
+        severity: "critical"
+        action: "fail"
+      
+      quality_checks:
+        - name: "no_negative_age"
+          column: "user_age_cleaned"
+          check: "value >= 18"
+          severity: "critical"
+        
+        - name: "no_negative_watch_duration"
+          column: "Watch_Duration_Cleaned"
+          check: "value >= 0"
+          severity: "critical"
+        
+        - name: "no_logical_conflicts"
+          column: "user_clicked_cleaned"
+          check: "if clicked then watch_duration > 0"
+          severity: "high"
+
+# ============================================================
+# 4. FEATURE ENGINEERING CONFIGURATION
+# ============================================================
+feature_engineering:
+  temporal_features:
+    - hour_of_day
+    - day_of_week
+    - month
+    - is_weekend
+    - time_of_day_category
+    - time_since_last_action
+  
+  user_behavior_features:
+    - user_total_clicks
+    - user_total_impressions
+    - user_ctr
+    - session_id
+    - watch_duration_ratio
+  
+  ad_performance_features:
+    - ad_total_clicks
+    - ad_total_impressions
+    - ad_ctr
+    - ad_total_conversions
+    - ad_conversion_rate
+    - ad_avg_watch_time
+    - ad_avg_engagement_score
+  
+  demographic_features:
+    - age_category
+    - category_performance_by_age
+    - demographic_engagement_delta
+    - platform_avg_roas
+    - device_ctr
+  
+  financial_features:
+    - revenue_per_click
+    - total_revenue
+    - total_cost
+    - return_on_ad_spend
+    - profit_margin
+    - cost_per_conversion
+
+# ============================================================
+# 5. ML PIPELINE CONFIGURATION
+# ============================================================
+ml_pipeline:
+  random_seed: 42
+  test_split_ratio: 0.2
+  cross_validation_folds: 5
+  
+  use_cases:
+    - name: "ctr_prediction"
+      target: "ctr"
+      type: "regression"
+      algorithms: ["RandomForestRegressor", "GradientBoosting", "XGBoost"]
+    
+    - name: "roas_prediction"
+      target: "roas"
+      type: "regression"
+      algorithms: ["RandomForestRegressor", "GradientBoosting", "XGBoost"]
+    
+    - name: "conversion_prediction"
+      target: "conversion_rate"
+      type: "regression"
+      algorithms: ["RandomForestRegressor", "GradientBoosting", "XGBoost"]
+    
+    - name: "high_performance_classification"
+      target: "high_performance"
+      type: "classification"
+      algorithms: ["RandomForestClassifier", "GradientBoosting", "XGBoost"]
+  
+  hyperparameter_tuning:
+    enabled: true
+    max_trials: 20
+    search_strategy: "random"
+
+# ============================================================
+# 6. DEPLOYMENT & SCHEDULING
+# ============================================================
+deployment:
+  environment: "development"
+  
+  databricks:
+    workspace_url: "https://adb-xxxxx.azuredatabricks.net"
+    cluster_id: "xxxx-xxxx-xxxx-xxxx"
+    job_cluster: "adtech_optimizer_cluster"
+    spark_version: "13.3.x-scala2.12"
+    node_type: "Standard_DS3_v2"
+    min_workers: 2
+    max_workers: 4
+  
+  aws_s3:
+    bucket_name: "ad-gold-dataset-bucket"
+    region: "ap-south-1"
+    processed_path: "s3://ad-gold-dataset-bucket/gold/"
+    model_path: "s3://adtech-optimizer-data/models/"
+    logs_path: "s3://adtech-optimizer-data/logs/"
+    raw_backup_path: "s3://adtech-optimizer-data/raw-backup/"
+  
+  schedule:
+    data_ingestion: "0 2 * * *"
+    data_cleansing: "0 3 * * *"
+    feature_engineering: "0 4 * * *"
+    ml_training: "0 5 * * 0"
+    model_deployment: "0 6 * * 1"
+
+# ============================================================
+# 7. MONITORING & ALERTING
+# ============================================================
+monitoring:
+  data_quality:
+    check_frequency: "daily"
+    alert_email: "sanju@adtech.com"
+    slack_webhook: "https://hooks.slack.com/services/xxx/yyy/zzz"
+  
+  model_performance:
+    monitoring_frequency: "daily"
+    drift_threshold: 0.10
+    action: "retrain_model"
+  
+  pipeline_health:
+    max_runtime_minutes: 120
+    alert_on_failure: true
+    alert_on_slowdown: true
+    slowdown_threshold_minutes: 30
+
+# ============================================================
+# 8. GIT & CI/CD CONFIGURATION
+# ============================================================
+git:
+  repository: "https://github.com/your-org/adtech-optimizer"
+  branch: "main"
+  ci_cd:
+    enabled: true
+    provider: "github_actions"
+    test_stage: "python -m pytest tests/"
+    deploy_stage: "databricks repos update"
+  
+  code_review:
+    required: true
+    reviewers: 2
+    checklist:
+      - "YAML validation"
+      - "Data quality checks"
+      - "ML model performance"
+      - "Documentation update"

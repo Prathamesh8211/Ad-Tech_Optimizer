@@ -1,0 +1,18 @@
+1. 📌 **Direct Answer**: The top performing campaigns across Food, Gaming, Health, and Travel are led by **AD_0096 (Food - Carousel) at 213.49x ROAS** and **AD_0396 (Health - Carousel) at 204.06x ROAS**. Each of the four categories has at least one standout campaign, with Carousel and Video formats dominating the leaderboard.
+
+2. 📊 **Key Metrics**:
+   • **AD_0096 (Food)**: $0.35 spend ➔ $74.72 revenue ➔ **213.49x ROAS**
+   • **AD_0396 (Health)**: $0.47 spend ➔ $95.91 revenue ➔ **204.06x ROAS**
+   • **AD_0233 (Health)**: $0.72 spend ➔ $110.06 revenue ➔ **152.86x ROAS**
+   • **AD_0172 (Travel)**: $0.57 spend ➔ $82.64 revenue ➔ **144.98x ROAS**
+   • **AD_0332 (Gaming)**: $0.88 spend ➔ $104.68 revenue ➔ **118.95x ROAS**
+   
+   *Context: These top campaigns massively outperform their category averages (Food 6.22x, Gaming 7.21x, Health 7.75x, Travel 5.90x).*
+
+3. 💡 **Business Insight**: Carousel format is the clear winner, claiming 3 of the top 5 spots — especially strong in Health and Food verticals where visual storytelling drives conversion. These elite campaigns are running on extremely low spend (under $1.00), suggesting they have not yet been scaled to their true potential. The Health category is uniquely strong, owning two top-tier performers, while Travel is punching above its category average weight with AD_0172.
+
+4. 🚀 **Action**:
+   • 🟢 **SCALE immediately**: AD_0096 (Food), AD_0396 (Health), and AD_0233 (Health) — all showing 150x+ ROAS on minimal spend; aggressively increase budgets to unlock more revenue.
+   • 🟢 **SCALE**: AD_0172 (Travel) and AD_0332 (Gaming) — strong 100x+ ROAS campaigns ready for budget expansion.
+   • 🟡 **MONITOR**: Increase spend in 10–20% daily increments and watch for ROAS compression; the current spend levels are too low to validate true scalability.
+   • 🟢 **Replicate**: Use Carousel creative frameworks from AD_0096, AD_0396, and AD_0172 as templates for new campaigns in these verticals.

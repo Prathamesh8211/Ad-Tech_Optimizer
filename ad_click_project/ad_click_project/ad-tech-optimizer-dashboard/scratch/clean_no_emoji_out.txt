@@ -1,0 +1,9 @@
+**Summary**: Food leads with AD_0096 at 213.49x ROAS, followed by strong Health, Travel, and Gaming performers all exceeding 118x return on spend.
+
+**Key Metrics**:
+- AD_0096 (Food) is the standout: $74.72 made from $0.35 spent = about $213 returned per $1 invested.
+- Health dominates volume with two campaigns (AD_0396 and AD_0233) delivering $206 combined revenue from just $1.19 total spend, averaging roughly $173 returned per $1.
+
+**Action Items**:
+- **Scale**: Immediately increase budget on the top five high-ROAS campaigns (AD_0096, AD_0396, AD_0233, AD_0172, AD_0332) to capitalize on their proven efficiency.
+- **Pause/Fix**: Audit the Travel category, which lags at 5.90x ROAS versus the 6.71x focus group average, and reallocate that spend toward top performers.

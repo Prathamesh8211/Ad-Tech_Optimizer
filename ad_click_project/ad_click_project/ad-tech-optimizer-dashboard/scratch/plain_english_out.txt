@@ -1,0 +1,25 @@
+# � Top Performing Campaign Analysis: Food, Gaming, Health, Travel
+
+1. 📌 **Direct Answer**:
+The top ROAS-winning campaign across these four categories is **AD_0096 (Food - Carousel)** at **213.49x**, meaning every $1 spent returned $213. Carousel ads dominate the leaderboard, taking 3 of the top 4 spots, while Health is the only category with two campaigns in the top tier.
+
+2. 📊 **Key Metrics**:
+
+   🥇 **Food Winner — AD_0096 (Carousel)**: $74.72 made from just $0.35 spent = $213 returned for every $1 invested.
+
+   🥈 **Health Winner — AD_0396 (Carousel)**: $95.91 earned from $0.47 spend = $204 returned for every $1 spent.
+
+   🥉 **Travel Winner — AD_0172 (Carousel)**: $82.64 earned from $0.57 spend = $145 returned for every $1 spent.
+
+   🎮 **Gaming Winner — AD_0332 (Video)**: $104.68 earned from $0.88 spend = $119 returned for every $1 spent.
+
+3. 💡 **Business Takeaway**:
+   Carousel ad format is the clear winner across categories — it's flexible, engaging, and outperforms single-image and video formats in these verticals. However, all four top campaigns spent less than $1, meaning the high ROAS is built on **tiny test budgets**. The creative is proven to convert, but we don't yet know if it can scale profitably with larger budgets. Health stands out as the strongest category overall (avg ROAS 7.75x) and also produced the second-highest ROAS campaign, making it a high-confidence category to scale.
+
+4. � **Recommended Actions**:
+
+   🟢 **Scale Immediately**: Increase budgets on AD_0096 (Food), AD_0396 (Health), AD_0233 (Health), and AD_0172 (Travel) — winners in Carousel format deserve more spend to validate if high ROAS holds at scale.
+
+   🟡 **Monitor Closely**: Watch ROAS daily as budgets grow. If ROAS drops below 5x when spend exceeds $50, pause and re-optimize before losses pile up.
+
+   🔴 **Test Gaming Video Differently**: AD_0332 is the only Video winner — replicate its creative formula with new variations but don't put full budget into a single video ad until proven at higher spend.

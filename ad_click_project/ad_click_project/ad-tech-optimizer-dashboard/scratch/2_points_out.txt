@@ -1,0 +1,16 @@
+# Executive Summary: Top Performing Category Campaigns
+
+1. 📌 **Direct Answer**
+The highest ROAS campaigns across Food, Gaming, Health, and Travel are all small-budget Carousel and Video ads that are delivering extraordinary returns, with **Food campaign AD_0096 leading at a 213.49x ROAS** — turning just $0.35 of ad spend into $74.72 of revenue.
+
+2. 📊 **Key Metrics**
+- **Campaign AD_0096 (Food — Carousel):** Spent only **$0.35** and generated **$74.72** in revenue. In plain terms, **$213 was returned for every $1 spent**.
+- **Campaign AD_0396 (Health — Carousel):** Spent just **$0.47** and produced **$95.91** in revenue, meaning **$204 was returned for every $1 spent**.
+- **Campaign AD_0332 (Gaming — Video):** Spent **$0.88** and earned **$104.68** in revenue, or roughly **$119 returned for every $1 spent** — making it the top Gaming performer.
+
+3. 💡 **Business Takeaway**
+These campaigns are performing exceptionally well because they use **high-engagement ad formats** (Carousel and Video) and appear to have been shown to **highly relevant, high-intent audiences** during early testing. The extremely low spend suggests these are still in a learning/test phase, meaning there is strong potential to **scale them profitably** before performance tapers off. Conversely, **Travel is the weakest category at 5.90x ROAS** (vs. the 7.70x portfolio average), signaling room for creative or audience optimization.
+
+4. 🚀 **Recommended Actions**
+- 🟢 **Scale**: Immediately increase daily budgets on the top 5 high-ROAS campaigns (AD_0096, AD_0396, AD_0233, AD_0172, AD_0332) to capture more revenue while performance remains strong.
+- 🔴 **Pause/Fix**: Audit and optimize the underperforming Travel category (5.90x ROAS — below portfolio average) by refreshing creatives, refining audiences, or pausing low-ROAS campaigns before scaling further.

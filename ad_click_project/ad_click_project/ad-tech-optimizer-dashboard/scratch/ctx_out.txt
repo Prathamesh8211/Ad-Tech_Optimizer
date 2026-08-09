@@ -1,0 +1,24 @@
+Portfolio Context (500 active campaigns):
+• Total Ad Spend: $6,091.78 | Total Revenue: $14,511.54
+• Average ROAS: 7.70x | Avg CTR: 1.98% | Avg CPC: $0.85
+
+🎯 Specific Category Focus: [Food, Gaming, Electronics, Fashion, Health]
+• Active Campaigns in Category Focus: 414
+• Focus Group Spend: $4,936.26 | Revenue: $11,769.39 | Avg ROAS: 8.08x
+
+Category Overview:
+  • Food: 97 campaigns | Spend: $1,111.23 | Rev: $2,253.95 | ROAS: 6.22x
+  • Gaming: 75 campaigns | Spend: $844.68 | Rev: $2,165.30 | ROAS: 7.21x
+  • Electronics: 90 campaigns | Spend: $1,093.04 | Rev: $2,944.03 | ROAS: 10.53x
+  • Fashion: 75 campaigns | Spend: $932.15 | Rev: $2,384.29 | ROAS: 8.74x
+  • Health: 77 campaigns | Spend: $955.16 | Rev: $2,021.82 | ROAS: 7.75x
+
+Weakest High-Spend Campaigns:
+• Campaign AD_0144 (Health - Text): Spend: $59.86 | Revenue: $0.00 | ROAS: 0.00x
+• Campaign AD_0456 (Gaming - Text): Spend: $55.60 | Revenue: $45.49 | ROAS: 0.82x
+• Campaign AD_0467 (Fashion - Text): Spend: $55.48 | Revenue: $58.35 | ROAS: 1.05x
+• Campaign AD_0494 (Gaming - Carousel): Spend: $54.80 | Revenue: $84.93 | ROAS: 1.55x
+• Campaign AD_0305 (Fashion - Video): Spend: $52.50 | Revenue: $0.00 | ROAS: 0.00x
+• Campaign AD_0019 (Food - Image): Spend: $52.07 | Revenue: $0.00 | ROAS: 0.00x
+• Campaign AD_0068 (Fashion - Text): Spend: $47.73 | Revenue: $54.69 | ROAS: 1.15x
+• Campaign AD_0028 (Electronics - Video): Spend: $45.88 | Revenue: $0.00 | ROAS: 0.00x

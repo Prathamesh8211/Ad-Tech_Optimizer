@@ -1,0 +1,11 @@
+📌 **Summary**: Top ROAS winners are led by **AD_0096 (Food)** at 213.49x, followed by Health's **AD_0396** (204.06x) and Travel's **AD_0172** (144.98x).
+
+📊 **Key Metrics**:
+• **🥇 Food — AD_0096 (Carousel):** $74.72 made from $0.35 spent = **$213 returned per $1**.
+• **🥇 Gaming — AD_0332 (Video):** $104.68 made from $0.88 spent = **$119 returned per $1**.
+• **🥇 Health — AD_0396 (Carousel):** $95.91 made from $0.47 spent = **$204 returned per $1**.
+• **🥇 Travel — AD_0172 (Carousel):** $82.64 made from $0.57 spent = **$145 returned per $1**.
+
+🚀 **Action Items**:
+• 🟢 **Scale**: Immediately scale budget on Food AD_0096 and Health AD_0396 (Carousel) — both deliver $200+ per $1 spent, signalling untapped volume.
+• 🔴 **Pause/Fix**: Audit Travel (5.90x ROAS, lowest in focus group) and reallocate budget from underperformers into the top Carousel creatives.

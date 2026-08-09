@@ -1,0 +1,91 @@
+{
+  "catalog": {
+    "missing_columns": [],
+    "schema_ok": true,
+    "n_rows": 10500,
+    "dtype_mismatch": {},
+    "null_counts": {
+      "Ad_Device": 881,
+      "Ad_Type": 110
+    },
+    "duplicate_rows": "16",
+    "duplicate_ad_ids": "501",
+    "duplicate_ad_ids_list": [
+      "AD_328892",
+      "AD_230369",
+      "AD_452873",
+      "AD_993309",
+      "AD_557834",
+      "AD_385992",
+      "AD_496008",
+      "AD_597200",
+      "AD_189349",
+      "AD_710795"
+    ],
+    "invalid_ad_id_format": 0,
+    "invalid_ad_id_examples": [],
+    "unknown_categories": 2,
+    "unknown_category_examples": [
+      "Eletronics",
+      "Corrupted_Category"
+    ],
+    "cpc_negative": 364,
+    "cpc_zero": 0,
+    "cpc_parse_errors": 0,
+    "unknown_devices": 1,
+    "unknown_device_examples": [
+      "moble"
+    ],
+    "empty_locations": 0,
+    "unknown_ad_types": 0,
+    "unknown_ad_type_examples": [],
+    "video_ads_with_invalid_length": 0,
+    "nonvideo_ads_with_positive_length": 854,
+    "total_rows": 10500,
+    "total_columns": 13
+  },
+  "clicks": {
+    "missing_columns": [],
+    "schema_ok": true,
+    "n_rows": 2505000,
+    "null_counts": {
+      "Ad_Type": 416256,
+      "device": 417547
+    },
+    "duplicate_rows": "5000",
+    "unique_users": 50000,
+    "empty_user_ids": 0,
+    "invalid_uuid_format": 0,
+    "timestamp_parse_errors": 0,
+    "timestamp_min": "2026-01-01 00:00:02",
+    "timestamp_max": "2035-12-25 12:00:00",
+    "timestamp_outside_range": 446,
+    "ad_ids_in_catalog": 9999,
+    "ad_ids_not_in_catalog": 306515,
+    "rows_with_unmatched_ad_id": 375761,
+    "match_rate": 3.1591019670535903,
+    "watch_duration_parse_errors": 0,
+    "watch_duration_negative": 503,
+    "watch_duration_zero": 1435869,
+    "watch_duration_extreme_outliers": 502,
+    "wd_anomaly_neg12.5": 503,
+    "wd_anomaly_999999": 502,
+    "age_non_numeric": 0,
+    "age_negative": 656,
+    "age_above_65": 418,
+    "age_anomaly_-1": 656,
+    "age_anomaly_125": 0,
+    "unknown_devices": 0,
+    "unknown_device_examples": [],
+    "unknown_platforms": 0,
+    "unknown_platform_examples": [],
+    "unknown_genders": 0,
+    "unknown_gender_examples": [],
+    "invalid_user_clicked": 0,
+    "unknown_ad_types": 0,
+    "unknown_ad_type_examples": [],
+    "total_rows": 2505000,
+    "total_columns": 15
+  },
+  "timestamp": "2026-08-07T17:43:49.092525"
+}

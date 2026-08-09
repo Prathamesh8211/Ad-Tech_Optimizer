@@ -1,0 +1,532 @@
+# ============================================================
+# LLM SEMANTIC MAPPING - DATA DICTIONARY
+# ============================================================
+# Purpose: Enables AI agents to understand data meaning
+
+
+name: "adtech_data_dictionary"
+description: "Complete semantic mapping for Ad-Tech Optimizer"
+
+
+# ============================================================
+# SCHEMA DEFINITIONS
+# ============================================================
+schemas:
+  bronze:
+    description: "Raw ingested data with all injected anomalies"
+    
+    ad_click_logs:
+      description: "Raw user clickstream events from synthetic generation"
+      table: "adtech_catalog.bronze.ad_click_logs"  # ← FIXED
+      source_file: "raw_synthetic_ad_click_data.csv"
+      row_count: "~505,000"
+      
+      columns:
+        User_ID:
+          type: "string"
+          format: "UUID"
+          description: "Unique identifier for each user"
+          business_meaning: "Anonymized user ID for tracking user journeys across sessions"
+          llm_context: "Primary key for user-based aggregations and cohort analysis"
+          required: true
+          example: "66d6122f-db2a-4123-8a47-2305fbe08254"
+          anomalies: []
+        
+        Click_Timestamp:
+          type: "string"
+          description: "Timestamp when the click event occurred"
+          business_meaning: "When the user interacted with the advertisement"
+          llm_context: "Used for temporal analysis, sessionization, and time-based pattern detection"
+          formats: ["yyyy-MM-dd HH:mm:ss", "dd/MM/yyyy HH:mm"]
+          required: true
+          example: "2026-01-01 12:30:00"
+          anomalies: ["mixed_format", "future_dates_2035"]
+        
+        Ad_Reference_ID:
+          type: "string"
+          format: "AD_XXXXX"
+          description: "Ad identifier linking to catalog"
+          business_meaning: "Foreign key to ad catalog for joining ad metadata"
+          llm_context: "Used as the primary join key between clickstream and ad catalog"
+          required: true
+          example: "AD_81268"
+          anomalies: []
+        
+        Ad_Type:
+          type: "string"
+          description: "Type of advertisement creative"
+          business_meaning: "The format/medium of the ad being displayed"
+          llm_context: "Used for ad format optimization - different types perform differently"
+          valid_values: ["Video", "Image", "Text", "Carousel"]
+          required: false
+          example: "Video"
+          anomalies: ["lowercase_video", "uppercase_IMAGE", "typo_Vedeo"]
+        
+        Watch_Duration:
+          type: "double"
+          description: "Duration in seconds user watched the ad"
+          business_meaning: "Engagement depth indicator - how long user actually viewed"
+          llm_context: "Key engagement metric. Higher watch duration = higher engagement"
+          unit: "seconds"
+          valid_range: [0.0, 180.0]
+          required: false
+          example: 33.77
+          anomalies: ["negative_values", "overflow_999999", "click_but_zero_duration"]
+        
+        user_age:
+          type: "integer"
+          description: "Age of the user"
+          business_meaning: "Demographic attribute for audience segmentation"
+          llm_context: "Used for age-based targeting and demographic performance analysis"
+          valid_range: [18, 65]
+          required: false
+          example: 35
+          anomalies: ["underage_-1", "overflow_125"]
+        
+        device:
+          type: "string"
+          description: "Device used for browsing (CRITICAL: Contains corruption)"
+          business_meaning: "Device preference for ad optimization and targeting"
+          llm_context: "Some rows have corrupted format 'age device' like '47 DESKTOP' - needs cleaning"
+          valid_values: ["Desktop", "Mobile", "Tablet"]
+          required: false
+          example: "DESKTOP"
+          anomalies: ["typo_moble", "uppercase_DESKTOP", "corrupted_with_age_prefix", "nulls"]
+          fix_priority: "HIGH"
+        
+        platform_source:
+          type: "string"
+          description: "Source platform where user came from"
+          business_meaning: "Traffic source attribution for channel performance analysis"
+          llm_context: "Used for platform-specific ROAS and budget allocation decisions"
+          valid_values: ["google", "facebook", "instagram"]
+          required: false
+          example: "google"
+          anomalies: ["typo_gogle", "typo_facebok", "Unknown"]
+        
+        user_gender:
+          type: "string"
+          description: "User's gender"
+          business_meaning: "Demographic attribute for gender-based targeting"
+          llm_context: "Used for gender-based performance analysis and targeting"
+          valid_values: ["Male", "Female", "Other"]
+          required: false
+          example: "Female"
+          anomalies: ["identity_shifting_same_user_different_genders"]
+        
+        user_clicked:
+          type: "integer"
+          description: "Binary indicator if user clicked the ad"
+          business_meaning: "Conversion event indicator - the primary business goal"
+          llm_context: "Primary target variable for click prediction models"
+          valid_values: [0, 1]
+          required: true
+          example: 1
+          anomalies: ["clicked_but_zero_watch_time"]
+    
+    ad_metadata_catalog:
+      description: "Ad metadata catalog with anomalies"
+      table: "adtech_catalog.bronze.ad_metadata_catalog"  # ← FIXED
+      source_file: "ad_catalog_raw.csv"
+      row_count: "~1,050"
+      
+      columns:
+        Ad_Reference_ID:
+          type: "string"
+          format: "AD_XXXXX"
+          description: "Unique ad identifier"
+          business_meaning: "Primary key for ad catalog"
+          llm_context: "Used to join with clickstream data for ad-level analysis"
+          required: true
+          example: "AD_38972"
+          anomalies: ["duplicates_with_corrupted_category"]
+        
+        Ad_Category:
+          type: "string"
+          description: "Industry vertical or business domain"
+          business_meaning: "Category for segmentation and targeting"
+          llm_context: "Used for category performance analysis and recommendations"
+          valid_values: ["Electronics", "Fashion", "Travel", "Health", "Gaming", "Food"]
+          required: true
+          example: "Electronics"
+          anomalies: ["lowercase", "typo_Eletronics", "Corrupted_Category"]
+        
+        Ad_Device:
+          type: "string"
+          description: "Target device for ad delivery"
+          business_meaning: "Device targeting strategy for campaign"
+          llm_context: "Used for device-specific performance optimization"
+          valid_values: ["Desktop", "Mobile", "Tablet", "All-Devices"]
+          required: false
+          example: "Desktop"
+          anomalies: ["whitespace_ Mobile_", "typo_moble", "empty_string", "nulls"]
+        
+        Ad_Location:
+          type: "string"
+          description: "Target Indian state for geographic targeting"
+          business_meaning: "Location-based targeting and regional performance"
+          llm_context: "Used for location-based performance analysis"
+          valid_values: ["Maharashtra", "Delhi", "Karnataka", "Tamil Nadu", "Uttar Pradesh"]
+          required: false
+          example: "Maharashtra"
+          anomalies: ["trailing_spaces"]
+        
+        Cost_Per_Click:
+          type: "mixed"
+          description: "Cost per click bid amount in USD"
+          business_meaning: "Bid amount determines ad competitiveness"
+          llm_context: "Used for cost efficiency analysis and ROI calculations"
+          unit: "USD"
+          required: true
+          example: "$1.50"
+          anomalies: ["dollar_prefix", "negative_values_-1.50"]
+        
+        Ad_Type:
+          type: "string"
+          description: "Ad creative format"
+          business_meaning: "The visual/format type of advertisement"
+          llm_context: "Used for ad format optimization and creative performance"
+          valid_values: ["Video", "Image", "Text", "Carousel"]
+          required: false
+          example: "Video"
+          anomalies: ["lowercase_video", "typo_Vedeo", "uppercase_IMAGE", "typo_Carusel", "nulls"]
+        
+        ad_video_length:
+          type: "mixed"
+          description: "Video duration in seconds"
+          business_meaning: "Length of video ads for duration optimization"
+          llm_context: "Used for watch duration ratio calculation (watch_duration / video_length)"
+          unit: "seconds"
+          required: false
+          example: 36
+          anomalies: ["string_45s", "logical_conflict_non_video_with_length"]
+
+  silver:
+    description: "Cleaned and standardized data ready for analysis"
+    
+    conformed_user_clicks:
+      description: "Cleaned user click data with all formats standardized"
+      table: "adtech_catalog.silver.conformed_user_clicks"  # ← FIXED
+      row_count: "~500,000"
+      cleaning_summary:
+        - "Deduplicated exact rows"
+        - "Standardized timestamp to yyyy-MM-dd HH:mm:ss"
+        - "Fixed Ad_Type casing and typos"
+        - "Cleaned Watch_Duration (negative→0, overflow→180)"
+        - "Cleaned user_age (-1→25, 125→35)"
+        - "Fixed device corruption (extracted clean device from 'age device')"
+        - "Fixed platform_source typos"
+        - "Fixed user_gender identity shifts"
+        - "Fixed logical conflicts (clicked but 0 watch time)"
+      
+      columns:
+        User_ID:
+          type: "string"
+          description: "Cleaned user identifier"
+          business_meaning: "Standardized user ID for analysis"
+        
+        Click_Timestamp_Standard:
+          type: "timestamp"
+          format: "yyyy-MM-dd HH:mm:ss"
+          description: "Standardized timestamp"
+          business_meaning: "Unified time for temporal analysis"
+        
+        Ad_Reference_ID:
+          type: "string"
+          description: "Cleaned ad identifier"
+          business_meaning: "Ad reference for joins"
+        
+        Ad_Type_Standard:
+          type: "string"
+          description: "Standardized ad type"
+          business_meaning: "Categorized creative format"
+        
+        Watch_Duration_Cleaned:
+          type: "double"
+          description: "Cleaned watch duration (0-180 seconds)"
+          business_meaning: "Validated engagement metric"
+        
+        user_age_cleaned:
+          type: "integer"
+          description: "Cleaned age (18-100)"
+          business_meaning: "Validated demographic"
+        
+        device_cleaned:
+          type: "string"
+          description: "Cleaned device type"
+          business_meaning: "Standardized device classification"
+        
+        platform_source_cleaned:
+          type: "string"
+          description: "Cleaned platform source"
+          business_meaning: "Standardized traffic attribution"
+        
+        user_gender_fixed:
+          type: "string"
+          description: "Cleaned gender"
+          business_meaning: "Standardized demographic"
+        
+        user_clicked_cleaned:
+          type: "integer"
+          description: "Cleaned click indicator"
+          business_meaning: "Validated conversion event"
+        
+        ingestion_timestamp:
+          type: "timestamp"
+          description: "When record was ingested"
+          business_meaning: "Audit and lineage tracking"
+    
+    conformed_ad_catalog:
+      description: "Cleaned ad metadata with standardized fields"
+      table: "adtech_catalog.silver.conformed_ad_catalog"  # ← FIXED
+      row_count: "~1,000"
+      cleaning_summary:
+        - "Removed duplicate Ad_Reference_ID (kept latest)"
+        - "Fixed Ad_Category casing and typos"
+        - "Fixed Ad_Device (trimmed whitespace, fixed typos)"
+        - "Fixed Ad_Location (trimmed trailing spaces)"
+        - "Fixed Cost_Per_Click (removed $, negative→0)"
+        - "Fixed Ad_Type casing and typos"
+        - "Fixed ad_video_length (converted '45s'→45, non-video length→0)"
+
+  gold:
+    description: "Analytical tables with feature engineering"
+    
+    fact_ad_performance:
+      description: "Aggregated ad performance metrics for ML"
+      table: "adtech_catalog.gold.fact_ad_performance"  # ← FIXED
+      row_count: "~1,000"
+      features_count: 30+
+      
+      columns:
+        Ad_Reference_ID:
+          type: "string"
+          description: "Ad identifier"
+          business_meaning: "Primary key for analysis"
+        
+        ad_category:
+          type: "string"
+          description: "Standardized category"
+          business_meaning: "Category for segmentation"
+        
+        ad_device:
+          type: "string"
+          description: "Target device"
+          business_meaning: "Device strategy"
+        
+        ad_location:
+          type: "string"
+          description: "Target location"
+          business_meaning: "Location strategy"
+        
+        ad_type:
+          type: "string"
+          description: "Ad creative type"
+          business_meaning: "Format optimization"
+        
+        cost_per_click:
+          type: "decimal(10,2)"
+          description: "Cost per click"
+          business_meaning: "Bid optimization"
+        
+        total_clicks:
+          type: "integer"
+          description: "Total clicks received"
+          business_meaning: "Conversion volume"
+        
+        total_impressions:
+          type: "integer"
+          description: "Total impressions/views"
+          business_meaning: "Reach metric"
+        
+        ctr:
+          type: "double"
+          description: "Click-through rate"
+          business_meaning: "Ad effectiveness KPI"
+          formula: "(total_clicks / total_impressions) * 100"
+          target_range: "2% - 5%"
+        
+        conversion_rate:
+          type: "double"
+          description: "Conversion rate from clicks"
+          business_meaning: "Quality of traffic"
+          formula: "total_conversions / total_clicks"
+        
+        roas:
+          type: "double"
+          description: "Return on ad spend"
+          business_meaning: "Financial efficiency"
+          formula: "total_revenue / total_cost"
+          target: "> 2.0"
+        
+        avg_ded_score:
+          type: "double"
+          description: "Demographic Engagement Delta Score"
+          business_meaning: "Measures fit between ad and audience"
+          range: [0.0, 1.0]
+          interpretation: ">0.8 = perfect match, <0.2 = poor match"
+        
+        high_performance:
+          type: "integer"
+          description: "Binary flag for top performers"
+          business_meaning: "ML target variable for classification"
+          definition: "Top 20% of ads by CTR"
+
+# ============================================================
+# BUSINESS METRICS DEFINITIONS (FOR STREAMLIT DASHBOARD)
+# ============================================================
+business_metrics:
+  CTR:
+    formula: "(total_clicks / total_impressions) * 100"
+    description: "Click-through rate - measures ad effectiveness and creative quality"
+    target_range: "2% - 5%"
+    interpretation: "Higher CTR indicates better ad relevance and creative quality"
+  
+  CPC:
+    formula: "total_ad_spend / total_clicks"
+    description: "Cost per click - measures cost efficiency of campaign"
+    target_range: "$0.50 - $3.00"
+    interpretation: "Lower CPC indicates better cost efficiency"
+  
+  Conversion_Rate:
+    formula: "total_conversions / total_clicks"
+    description: "Percentage of clicks that convert to desired action"
+    target_range: "5% - 15%"
+    interpretation: "Higher conversion rate indicates better audience quality"
+  
+  ROAS:
+    formula: "total_revenue / total_ad_spend"
+    description: "Return on ad spend - primary financial metric"
+    target_range: "> 2.0x"
+    interpretation: "ROAS > 2.0 means profitable campaign"
+  
+  DED_Score:
+    formula: "category_performance_by_age"
+    description: "Demographic Engagement Delta - fit between user and ad"
+    range: "0.0 - 1.0"
+    interpretation: ">0.8 = perfect audience match, <0.2 = poor match"
+  
+  Engagement_Score:
+    formula: "(clicked * 0.4) + (watch_duration/60 * 0.3) + (ctr * 0.3)"
+    description: "Weighted engagement metric combining multiple signals"
+    range: "0.0 - 1.0"
+    interpretation: "Higher score = better overall engagement"
+
+# ============================================================
+# ML FEATURE DEFINITIONS
+# ============================================================
+ml_features:
+  categorical:
+    - name: "ad_category"
+      type: "string"
+      cardinality: 6
+      encoding: "string_indexer"
+      description: "Industry vertical of the ad"
+    
+    - name: "ad_type"
+      type: "string"
+      cardinality: 4
+      encoding: "string_indexer"
+      description: "Creative format of the ad"
+    
+    - name: "device_cleaned"
+      type: "string"
+      cardinality: 4
+      encoding: "string_indexer"
+      description: "Device type used"
+    
+    - name: "age_category"
+      type: "string"
+      cardinality: 4
+      encoding: "string_indexer"
+      description: "Age bucket (18-24, 25-34, 35-49, 50+)"
+  
+  numerical:
+    - name: "cost_per_click"
+      type: "decimal"
+      scaling: "standard"
+      description: "Bid amount"
+    
+    - name: "ad_video_length"
+      type: "double"
+      scaling: "standard"
+      description: "Video duration in seconds"
+    
+    - name: "total_impressions"
+      type: "integer"
+      scaling: "standard"
+      description: "Reach volume"
+    
+    - name: "avg_user_age"
+      type: "double"
+      scaling: "standard"
+      description: "Average viewer age"
+    
+    - name: "avg_watch_duration"
+      type: "double"
+      scaling: "standard"
+      description: "Average watch time"
+
+# ============================================================
+# DASHBOARD & REPORTING DIMENSIONS (FOR STREAMLIT)
+# ============================================================
+reporting_dimensions:
+  time:
+    name: "Time Dimension"
+    granularities: ["hour", "day", "week", "month"]
+    default: "day"
+    description: "Time-based analysis and trends"
+  
+  category:
+    name: "Category"
+    field: "ad_category"
+    default: "All"
+    description: "Filter by ad category"
+  
+  device:
+    name: "Device"
+    field: "device_cleaned"
+    default: "All"
+    description: "Filter by device type"
+  
+  location:
+    name: "Location"
+    field: "ad_location"
+    default: "All"
+    description: "Filter by geographic region"
+  
+  platform:
+    name: "Platform"
+    field: "platform_source_cleaned"
+    default: "All"
+    description: "Filter by traffic source"
+  
+  age_group:
+    name: "Age Group"
+    field: "age_category"
+    default: "All"
+    description: "Filter by user age cohort"
+
+# ============================================================
+# LLM CONTEXT FOR AGENTIC AI
+# ============================================================
+llm_context:
+  business_context: |
+    This is an Ad-Tech optimization platform that helps businesses optimize 
+    their digital advertising campaigns. The platform analyzes clickstream data 
+    to predict ad performance, optimize budget allocation, and recommend 
+    audience targeting strategies.
+  
+  key_insights:
+    - "Ads with ROAS > 2.0 are profitable"
+    - "Video ads on Mobile have highest engagement rates"
+    - "Weekday mornings (10 AM - 1 PM) have highest conversion rates"
+    - "Users aged 25-34 are most likely to convert"
+    - "Facebook platform shows highest ROAS for Fashion category"
+  
+  optimization_actions:
+    - "Reallocate budget from low ROAS platforms to high ROAS platforms"
+    - "Exclude low-performing demographic segments from targeting"
+    - "Increase bids during peak conversion hours"
+    - "Recommend alternative ad categories for poor-performing demographics"
+    - "Pause campaigns during dead zones (Friday 6 PM onwards)"

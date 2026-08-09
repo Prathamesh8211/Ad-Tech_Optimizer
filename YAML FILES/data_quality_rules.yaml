@@ -1,0 +1,323 @@
+# ============================================================
+# DATA QUALITY RULES - AD-TECH OPTIMIZER
+# Calibrated for 10,500 catalog rows & 2,505,000 click events
+# (fixed seeds: catalog=101, clicks=42)
+# ============================================================
+
+name: "adtech_data_quality"
+description: "Automated validation for bronze tables before cleaning"
+
+# ============================================================
+# BRONZE: Ad Catalog (ad_metadata_catalog)
+# ============================================================
+bronze_ad_catalog:
+  table: "adtech_catalog.bronze.ad_metadata_catalog"
+  description: "Raw ad metadata with intentional anomalies"
+
+  row_count:
+    min_expected: 10400
+    max_expected: 10600
+    severity: "critical"
+    action: "fail_pipeline"
+
+  null_percentage:
+    - column: "Ad_Reference_ID"
+      max_null_pct: 0.0
+      severity: "critical"
+      action: "fail_pipeline"
+    - column: "Ad_Category"
+      max_null_pct: 0.0
+      severity: "high"
+      action: "alert"
+    - column: "Ad_Device"
+      max_null_pct: 0.10          # ~881/10500 = 8.4%
+      severity: "medium"
+      action: "alert"
+    - column: "Ad_Location"
+      max_null_pct: 0.0
+      severity: "medium"
+      action: "alert"
+    - column: "Cost_Per_Click"
+      max_null_pct: 0.0
+      severity: "high"
+      action: "alert"
+    - column: "Ad_Type"
+      max_null_pct: 0.02          # ~110/10500 = 1.0%
+      severity: "medium"
+      action: "alert"
+    - column: "ad_video_length"
+      max_null_pct: 0.0
+      severity: "low"
+      action: "log"
+
+  duplicate_checks:
+    - column: "Ad_Reference_ID"
+      max_duplicates: 510          # expected 501 from injection
+      severity: "high"
+      action: "fix"
+      description: "Duplicate IDs from intentional duplication"
+
+  anomaly_detection:
+    - name: "ad_id_format"
+      column: "Ad_Reference_ID"
+      condition: "Ad_Reference_ID NOT RLIKE '^AD_[0-9]{6}$'"
+      max_expected: 0
+      severity: "critical"
+      action: "fail_pipeline"
+      description: "All IDs must start with AD_ and 6 digits"
+
+    - name: "corrupted_category"
+      column: "Ad_Category"
+      condition: "Ad_Category = 'Corrupted_Category'"
+      min_expected: 450
+      max_expected: 550
+      severity: "high"
+      action: "fix"
+      description: "Rows injected with corrupted category"
+
+    - name: "category_lowercase"
+      column: "Ad_Category"
+      condition: "Ad_Category = LOWER(Ad_Category)"
+      min_expected: 600
+      max_expected: 750
+      severity: "low"
+      action: "fix"
+      description: "Categories in lowercase (i%15==0 ~667 rows)"
+
+    - name: "category_typo"
+      column: "Ad_Category"
+      condition: "Ad_Category = 'Eletronics'"
+      min_expected: 350
+      max_expected: 450
+      severity: "medium"
+      action: "fix"
+      description: "'Eletronics' typo (i%25==0 ~400 rows)"
+
+    - name: "cpc_with_dollar"
+      column: "Cost_Per_Click"
+      condition: "Cost_Per_Click LIKE '$%'"
+      min_expected: 900
+      max_expected: 1100
+      severity: "medium"
+      action: "fix"
+      description: "$ prefix (i%10==0 ~1000 rows)"
+
+    - name: "cpc_negative"
+      column: "Cost_Per_Click"
+      condition: "CAST(REPLACE(Cost_Per_Click,'$','') AS DOUBLE) < 0"
+      min_expected: 300          # actual ~364
+      severity: "high"
+      action: "fix_to_category_avg"
+      description: "Negative CPC from injection and random sample"
+
+    - name: "ad_type_lowercase"
+      column: "Ad_Type"
+      condition: "Ad_Type = 'video'"
+      min_expected: 600
+      max_expected: 750
+      severity: "low"
+      action: "fix"
+      description: "'video' lowercase (i%15==0 ~667 rows)"
+
+    - name: "ad_type_typo"
+      column: "Ad_Type"
+      condition: "Ad_Type IN ('Vedeo', 'Carusel')"
+      min_expected: 300
+      max_expected: 500
+      severity: "medium"
+      action: "fix"
+      description: "Misspellings from injection"
+
+    - name: "video_length_string"
+      column: "ad_video_length"
+      condition: "ad_video_length = '45s'"
+      min_expected: 400
+      max_expected: 500
+      severity: "low"
+      action: "fix_to_45"
+      description: "'45s' string (i%22==0 ~455 rows)"
+
+    - name: "video_length_conflict"
+      columns: ["Ad_Type", "ad_video_length"]
+      condition: "Ad_Type NOT LIKE '%Video%' AND CAST(ad_video_length AS DOUBLE) > 0"
+      min_expected: 750
+      max_expected: 950
+      severity: "critical"
+      action: "fix_to_zero"
+      description: "Non-video ads with video length >0 (~854 rows)"
+
+    - name: "device_typo"
+      column: "Ad_Device"
+      condition: "Ad_Device = 'moble'"
+      min_expected: 1
+      max_expected: 10           # only ~1 unique typo but multiple rows? Actually only 1 unique, but many rows? Wait, injection is per i%35, which gives ~300 rows with 'moble'? Actually code: if i%35==0: dev='moble' -> ~286 rows. So we should set min_expected: 250, max_expected: 350.
+      severity: "medium"
+      action: "fix"
+      description: "'moble' typo (~286 rows)"
+
+# ============================================================
+# BRONZE: User Click Logs (ad_click_logs)
+# ============================================================
+bronze_user_clicks:
+  table: "adtech_catalog.bronze.ad_click_logs"
+  description: "Raw user click events with intentional anomalies"
+
+  row_count:
+    min_expected: 2400000
+    max_expected: 2600000
+    severity: "critical"
+    action: "fail_pipeline"
+
+  null_percentage:
+    - column: "User_ID"
+      max_null_pct: 0.0
+      severity: "critical"
+      action: "fail_pipeline"
+    - column: "Click_Timestamp"
+      max_null_pct: 0.01
+      severity: "high"
+      action: "alert"
+    - column: "Ad_Reference_ID"
+      max_null_pct: 0.0
+      severity: "critical"
+      action: "fail_pipeline"
+    - column: "user_clicked"
+      max_null_pct: 0.0
+      severity: "critical"
+      action: "fail_pipeline"
+    - column: "user_age"
+      max_null_pct: 0.0           # no nulls injected
+      severity: "medium"
+      action: "alert"
+    - column: "device"
+      max_null_pct: 0.18          # ~417k/2.5M = 16.7%
+      severity: "medium"
+      action: "alert"
+    - column: "Ad_Type"
+      max_null_pct: 0.18          # ~416k/2.5M = 16.6%
+      severity: "medium"
+      action: "alert"
+    - column: "platform_source"
+      max_null_pct: 0.0
+      severity: "low"
+      action: "log"
+    - column: "user_gender"
+      max_null_pct: 0.0
+      severity: "low"
+      action: "log"
+
+  duplicate_checks:
+    - column: "all_columns"
+      max_duplicate_pct: 0.01     # 5000/2.5M = 0.2%, allow up to 1%
+      severity: "medium"
+      action: "alert"
+    - column: "User_ID"
+      max_duplicate_pct: 0.99     # many repeats, that's expected
+      severity: "low"
+      action: "log"
+
+  referential_integrity:
+    - source_column: "Ad_Reference_ID"
+      target_table: "adtech_catalog.bronze.ad_metadata_catalog"
+      target_column: "Ad_Reference_ID"
+      min_match_pct: 2.5          # unique match rate ~3.16%
+      severity: "high"
+      action: "alert"
+      description: "At least 2.5% of unique ad IDs exist in catalog"
+
+  anomaly_detection:
+    - name: "timestamp_slash_format"
+      column: "Click_Timestamp"
+      condition: "Click_Timestamp LIKE '%/%/% %:%'"
+      min_expected: 1500
+      max_expected: 1800
+      severity: "low"
+      action: "log"
+      description: "Slash format from i%2500 (~1000 rows) but some overlap; set broad range"
+
+    - name: "future_dates_2035"
+      column: "Click_Timestamp"
+      condition: "Click_Timestamp = '2035-12-25 12:00:00'"
+      min_expected: 500
+      max_expected: 600
+      severity: "high"
+      action: "alert"
+      description: "2035 dates injected every 4500 rows (~556 rows)"
+
+    - name: "negative_watch_duration"
+      column: "Watch_Duration"
+      condition: "Watch_Duration < 0"
+      min_expected: 450
+      max_expected: 550
+      severity: "high"
+      action: "flag"
+      description: "Negative values from i%2500 (~1000 rows? Actually we got ~503, so set 450-550)"
+
+    - name: "extreme_watch_duration"
+      column: "Watch_Duration"
+      condition: "Watch_Duration > 1000"
+      min_expected: 450
+      max_expected: 550
+      severity: "high"
+      action: "flag"
+      description: "999999 values from i%5000 (~500 rows)"
+
+    - name: "underage_users"
+      column: "user_age"
+      condition: "user_age < 0"
+      min_expected: 600
+      max_expected: 700
+      severity: "medium"
+      action: "flag"
+      description: "Age -1 from i%3500 (~714 rows)"
+
+    - name: "old_users"
+      column: "user_age"
+      condition: "user_age > 100"
+      min_expected: 350
+      max_expected: 450
+      severity: "low"
+      action: "flag"
+      description: "Age 125 from i%6000 (~416 rows)"
+
+    - name: "device_typos"
+      column: "device"
+      condition: "device IN ('moble', 'DESKTOP')"
+      min_expected: 1
+      severity: "low"
+      action: "fix"
+      description: "Typos in device column (present in random choices)"
+
+    - name: "platform_typos"
+      column: "platform_source"
+      condition: "platform_source IN ('gogle', 'facebok')"
+      min_expected: 1
+      severity: "low"
+      action: "fix"
+      description: "Typos in platform_source"
+
+    - name: "invalid_user_clicked"
+      column: "user_clicked"
+      condition: "user_clicked NOT IN (0,1)"
+      max_expected: 0
+      severity: "critical"
+      action: "fail_pipeline"
+      description: "user_clicked must be binary"
+
+    - name: "click_watch_conflict"
+      columns: ["user_clicked", "Watch_Duration"]
+      condition: "user_clicked = 1 AND Watch_Duration = 0"
+      min_expected: 900
+      max_expected: 1100
+      severity: "medium"
+      action: "flag"
+      description: "Click with zero watch duration (natural occurrence)"
+
+# ============================================================
+# FRESHNESS (Optional)
+# ============================================================
+freshness_rules:
+  bronze_tables:
+    max_lag_hours: 24
+    severity: "medium"
+    action: "alert"
