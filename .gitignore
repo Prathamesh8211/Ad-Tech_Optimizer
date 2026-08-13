@@ -103,3 +103,5 @@ ad_click_project/**/*.ipynb
 Ad-Tech\ Optimizer/**/*_data.*
 Ad-Tech\ Optimizer/**/*.parquet
 Ad-Tech\ Optimizer/**/*.csv
+venv/
+__pycache__/
