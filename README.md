@@ -269,7 +269,7 @@ A compact selector switches between two views:
 - `databricks-sdk>=0.12.0`: Databricks platform SDK
 - `python-dotenv>=1.0.0`: Environment variable management
 
-## 🤝 Contributing
+##  Contributing
 
 We welcome contributions to improve the Ad-Tech Optimizer!
 
@@ -283,7 +283,7 @@ We welcome contributions to improve the Ad-Tech Optimizer!
 
 This project is licensed under the MIT License.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Synthetic data generation based on realistic advertising patterns
 - MLflow for experiment tracking and model management
