@@ -58,7 +58,7 @@ Raw Data → [Bronze Layer] → [Silver Layer] → [Gold Layer] → [ML Models] 
 - MLflow integration for experiment tracking
 
 ### Dashboard Capabilities
-- **Unified Workspace:** A single combined perspective merging business-owner KPIs and agency/campaign metrics — no separate logins or selections
+- **Unified Workspace:** A single combined perspective merging business-owner KPIs and agency/campaign metrics — no separate role selection
 - **Three Focused Tabs:** Overview, Analytics, and Budget Optimizer
 - **Clean Light Theme:** High-contrast, readability-first UI
 - **Interactive Filters:** Global filters for ad category and date ranges
@@ -81,17 +81,14 @@ Ad-Tech_Optimizer/
 │   ├── .env                       # Environment variables (S3 / AWS)
 │   ├── mlflow.db                  # MLflow tracking database
 │   ├── .streamlit/                # Streamlit theme configuration
-│   ├── pages/                     # Dashboard tab modules
+│   ├── pages/                     # Dashboard tab modules (3 tabs)
 │   │   ├── _01_dashboard_home.py  #   → Overview tab
 │   │   ├── _02_predictions.py     #   → Analytics (Strategic Predictions)
 │   │   ├── _03_performance_insights.py  # → Analytics (Performance Insights)
-│   │   ├── _04_recommendations.py #   → Budget Optimizer tab
-│   │   └── _05_ai_copilot.py      #   → Optional AI copilot module
-│   ├── utils/                     # Helper modules
-│   │   ├── data_loader.py
-│   │   └── model_loader.py
-│   └── llm/
-│       └── copilot.py
+│   │   └── _04_recommendations.py #   → Budget Optimizer tab
+│   └── utils/                     # Helper modules
+│       ├── data_loader.py
+│       └── model_loader.py
 │
 ├── databricks_pipeline/           # Production pipeline + notebook versions
 │   ├── Bronze_layer/              # Raw data ingestion
@@ -269,7 +266,7 @@ A compact selector switches between two views:
 - `databricks-sdk>=0.12.0`: Databricks platform SDK
 - `python-dotenv>=1.0.0`: Environment variable management
 
-##  Contributing
+## 🤝 Contributing
 
 We welcome contributions to improve the Ad-Tech Optimizer!
 
@@ -279,9 +276,7 @@ We welcome contributions to improve the Ad-Tech Optimizer!
 4. Push to the branch: `git push origin feature/amazing-feature`
 5. Open a Pull Request
 
-## 📄 License
 
-This project is licensed under the MIT License.
 
 ## Acknowledgments
 
